@@ -15,11 +15,12 @@
         .word-card {
             transition: all 0.3s ease;
             cursor: pointer;
+            overflow: hidden;
         }
         
         .word-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
         }
         
         .category-btn {
@@ -53,15 +54,27 @@
         .pronunciation-btn {
             background: linear-gradient(135deg, #10b981, #059669);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
         
         .pronunciation-btn:hover {
             background: linear-gradient(135deg, #059669, #047857);
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
         
         .pronunciation-btn:active {
             transform: scale(0.95);
+        }
+        
+        .pronunciation-btn.playing {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
         .gradient-bg {
@@ -75,6 +88,53 @@
         .stats-gradient {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .word-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin: 0 auto 16px;
+            border: 3px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .word-card:hover .word-image {
+            border-color: #3b82f6;
+            transform: scale(1.1);
+        }
+        
+        .category-icon {
+            font-size: 1.2em;
+            margin-left: 8px;
+        }
+        
+        .audio-wave {
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: currentColor;
+            margin: 0 1px;
+            animation: wave 1.2s infinite ease-in-out;
+        }
+        
+        .audio-wave:nth-child(2) { animation-delay: -1.1s; }
+        .audio-wave:nth-child(3) { animation-delay: -1.0s; }
+        .audio-wave:nth-child(4) { animation-delay: -0.9s; }
+        
+        @keyframes wave {
+            0%, 40%, 100% { transform: scaleY(0.4); }
+            20% { transform: scaleY(1.0); }
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -83,7 +143,7 @@
         <div class="container mx-auto px-4 text-center">
             <div class="max-w-4xl mx-auto">
                 <h1 class="text-5xl font-bold mb-3">🇹🇷 آموزش ترکی استانبولی</h1>
-                <p class="text-xl opacity-90 mb-8">850 کلمه ضروری برای ایرانیان</p>
+                <p class="text-xl opacity-90 mb-8">850 کلمه ضروری با تصویر و تلفظ اصلی</p>
                 
                 <div class="flex justify-center items-center space-x-6 space-x-reverse">
                     <div class="bg-white bg-opacity-20 px-6 py-3 rounded-full">
@@ -95,8 +155,8 @@
                         <span class="text-sm block">دسته</span>
                     </div>
                     <div class="bg-white bg-opacity-20 px-6 py-3 rounded-full">
-                        <span class="font-bold text-lg">تلفظ</span>
-                        <span class="text-sm block">ترکی</span>
+                        <span class="font-bold text-lg">🔊</span>
+                        <span class="text-sm block">تلفظ ترکی</span>
                     </div>
                 </div>
             </div>
@@ -126,14 +186,30 @@
         <div class="container mx-auto px-4">
             <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">دسته‌بندی کلمات</h2>
             <div class="flex flex-wrap justify-center gap-3 mb-8" id="categoryButtons">
-                <button class="category-btn active bg-blue-600 text-white px-6 py-3 rounded-full font-medium" onclick="filterByCategory('all')">همه کلمات</button>
-                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium" onclick="filterByCategory('greetings')">احوال‌پرسی</button>
-                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium" onclick="filterByCategory('family')">خانواده</button>
-                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium" onclick="filterByCategory('food')">غذا</button>
-                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium" onclick="filterByCategory('numbers')">اعداد</button>
-                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium" onclick="filterByCategory('colors')">رنگ‌ها</button>
-                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium" onclick="filterByCategory('time')">زمان</button>
-                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium" onclick="filterByCategory('travel')">سفر</button>
+                <button class="category-btn active bg-blue-600 text-white px-6 py-3 rounded-full font-medium" onclick="filterByCategory('all')">
+                    <span class="category-icon">🌟</span>همه کلمات
+                </button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium" onclick="filterByCategory('greetings')">
+                    <span class="category-icon">👋</span>احوال‌پرسی
+                </button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium" onclick="filterByCategory('family')">
+                    <span class="category-icon">👨‍👩‍👧‍👦</span>خانواده
+                </button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium" onclick="filterByCategory('food')">
+                    <span class="category-icon">🍽️</span>غذا
+                </button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium" onclick="filterByCategory('colors')">
+                    <span class="category-icon">🎨</span>رنگ‌ها
+                </button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium" onclick="filterByCategory('numbers')">
+                    <span class="category-icon">🔢</span>اعداد
+                </button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium" onclick="filterByCategory('time')">
+                    <span class="category-icon">⏰</span>زمان
+                </button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium" onclick="filterByCategory('travel')">
+                    <span class="category-icon">✈️</span>سفر
+                </button>
             </div>
         </div>
     </section>
@@ -142,192 +218,147 @@
     <section class="py-8">
         <div class="container mx-auto px-4">
             <div class="text-center mb-6">
-                <span id="wordCount" class="text-lg text-gray-600">نمایش 50 کلمه از 850 کلمه</span>
+                <span id="wordCount" class="text-lg text-gray-600">نمایش 850 کلمه</span>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="wordsContainer">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="wordsGrid">
                 <!-- Words will be populated by JavaScript -->
-            </div>
-            
-            <!-- Load More Button -->
-            <div class="text-center mt-8">
-                <button id="loadMoreBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-medium transition-all duration-300" onclick="loadMoreWords()">
-                    نمایش کلمات بیشتر
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Statistics -->
-    <section class="py-16 stats-gradient">
-        <div class="container mx-auto px-4 text-center text-white">
-            <h2 class="text-3xl font-bold mb-8">آمار یادگیری</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-                <div class="bg-white bg-opacity-20 p-6 rounded-lg">
-                    <div class="text-4xl font-bold mb-2">850</div>
-                    <div class="text-lg">کل کلمات</div>
-                </div>
-                <div class="bg-white bg-opacity-20 p-6 rounded-lg">
-                    <div class="text-4xl font-bold mb-2">17</div>
-                    <div class="text-lg">دسته‌بندی</div>
-                </div>
-                <div class="bg-white bg-opacity-20 p-6 rounded-lg">
-                    <div class="text-4xl font-bold mb-2">100%</div>
-                    <div class="text-lg">رایگان</div>
-                </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8">
+    <footer class="bg-gray-800 text-white py-12 mt-16">
         <div class="container mx-auto px-4 text-center">
-            <p class="text-lg mb-4">🇹🇷 دیکشنری ترکی استانبولی</p>
-            <p class="text-gray-400">آموزش زبان ترکی برای ایرانیان</p>
+            <h3 class="text-2xl font-bold mb-4">🇹🇷 آموزش ترکی استانبولی</h3>
+            <p class="text-gray-300 mb-6">بهترین منبع یادگیری زبان ترکی برای ایرانیان</p>
+            <div class="flex justify-center space-x-4 space-x-reverse">
+                <span class="bg-gray-700 px-4 py-2 rounded-full">850 کلمه</span>
+                <span class="bg-gray-700 px-4 py-2 rounded-full">17 دسته</span>
+                <span class="bg-gray-700 px-4 py-2 rounded-full">تلفظ اصلی</span>
+            </div>
         </div>
     </footer>
 
     <script>
-        // Sample Turkish-Persian dictionary data
-        const turkishWords = [
+        // Enhanced dictionary data with images
+        const dictionary = [
             // Greetings
-            { turkish: "Merhaba", persian: "سلام", pronunciation: "مرحبا", category: "greetings" },
-            { turkish: "Günaydın", persian: "صبح بخیر", pronunciation: "گوناییدین", category: "greetings" },
-            { turkish: "İyi akşamlar", persian: "عصر بخیر", pronunciation: "ایی آکشاملار", category: "greetings" },
-            { turkish: "İyi geceler", persian: "شب بخیر", pronunciation: "ایی گجه‌لر", category: "greetings" },
-            { turkish: "Hoşça kal", persian: "خداحافظ", pronunciation: "هوشچا کال", category: "greetings" },
-            { turkish: "Teşekkür ederim", persian: "متشکرم", pronunciation: "تشکور ادریم", category: "greetings" },
-            { turkish: "Rica ederim", persian: "خواهش می‌کنم", pronunciation: "ریجا ادریم", category: "greetings" },
-            { turkish: "Özür dilerim", persian: "معذرت می‌خواهم", pronunciation: "اوزور دیلریم", category: "greetings" },
+            { turkish: "Merhaba", persian: "سلام", pronunciation: "مرحابا", category: "greetings", image: "👋" },
+            { turkish: "Günaydın", persian: "صبح بخیر", pronunciation: "گوناییدین", category: "greetings", image: "🌅" },
+            { turkish: "İyi akşamlar", persian: "عصر بخیر", pronunciation: "ایی آکشاملار", category: "greetings", image: "🌆" },
+            { turkish: "İyi geceler", persian: "شب بخیر", pronunciation: "ایی گجه‌لر", category: "greetings", image: "🌙" },
+            { turkish: "Hoşça kal", persian: "خداحافظ", pronunciation: "هوشچا کال", category: "greetings", image: "👋" },
+            { turkish: "Teşekkür ederim", persian: "متشکرم", pronunciation: "تشکور ادریم", category: "greetings", image: "🙏" },
+            { turkish: "Rica ederim", persian: "خواهش می‌کنم", pronunciation: "ریجا ادریم", category: "greetings", image: "🤝" },
+            { turkish: "Özür dilerim", persian: "معذرت می‌خواهم", pronunciation: "اوزور دیلریم", category: "greetings", image: "😔" },
 
             // Family
-            { turkish: "Anne", persian: "مادر", pronunciation: "آنه", category: "family" },
-            { turkish: "Baba", persian: "پدر", pronunciation: "بابا", category: "family" },
-            { turkish: "Kardeş", persian: "برادر/خواهر", pronunciation: "کاردش", category: "family" },
-            { turkish: "Oğul", persian: "پسر", pronunciation: "اوول", category: "family" },
-            { turkish: "Kız", persian: "دختر", pronunciation: "کیز", category: "family" },
-            { turkish: "Eş", persian: "همسر", pronunciation: "اش", category: "family" },
-            { turkish: "Dede", persian: "پدربزرگ", pronunciation: "دده", category: "family" },
-            { turkish: "Nine", persian: "مادربزرگ", pronunciation: "نینه", category: "family" },
+            { turkish: "Anne", persian: "مادر", pronunciation: "آنه", category: "family", image: "👩" },
+            { turkish: "Baba", persian: "پدر", pronunciation: "بابا", category: "family", image: "👨" },
+            { turkish: "Kardeş", persian: "برادر/خواهر", pronunciation: "کاردش", category: "family", image: "👫" },
+            { turkish: "Oğul", persian: "پسر", pronunciation: "اوول", category: "family", image: "👦" },
+            { turkish: "Kız", persian: "دختر", pronunciation: "کیز", category: "family", image: "👧" },
+            { turkish: "Eş", persian: "همسر", pronunciation: "اش", category: "family", image: "💑" },
+            { turkish: "Dede", persian: "پدربزرگ", pronunciation: "دده", category: "family", image: "👴" },
+            { turkish: "Nine", persian: "مادربزرگ", pronunciation: "نینه", category: "family", image: "👵" },
 
             // Food
-            { turkish: "Su", persian: "آب", pronunciation: "سو", category: "food" },
-            { turkish: "Ekmek", persian: "نان", pronunciation: "اکمک", category: "food" },
-            { turkish: "Et", persian: "گوشت", pronunciation: "ات", category: "food" },
-            { turkish: "Balık", persian: "ماهی", pronunciation: "بالیک", category: "food" },
-            { turkish: "Sebze", persian: "سبزیجات", pronunciation: "سبزه", category: "food" },
-            { turkish: "Meyve", persian: "میوه", pronunciation: "میوه", category: "food" },
-            { turkish: "Çay", persian: "چای", pronunciation: "چای", category: "food" },
-            { turkish: "Kahve", persian: "قهوه", pronunciation: "قهوه", category: "food" },
-
-            // Numbers
-            { turkish: "Bir", persian: "یک", pronunciation: "بیر", category: "numbers" },
-            { turkish: "İki", persian: "دو", pronunciation: "ایکی", category: "numbers" },
-            { turkish: "Üç", persian: "سه", pronunciation: "اوچ", category: "numbers" },
-            { turkish: "Dört", persian: "چهار", pronunciation: "دورت", category: "numbers" },
-            { turkish: "Beş", persian: "پنج", pronunciation: "بش", category: "numbers" },
-            { turkish: "Altı", persian: "شش", pronunciation: "آلتی", category: "numbers" },
-            { turkish: "Yedi", persian: "هفت", pronunciation: "یدی", category: "numbers" },
-            { turkish: "Sekiz", persian: "هشت", pronunciation: "سکیز", category: "numbers" },
+            { turkish: "Su", persian: "آب", pronunciation: "سو", category: "food", image: "💧" },
+            { turkish: "Ekmek", persian: "نان", pronunciation: "اکمک", category: "food", image: "🍞" },
+            { turkish: "Et", persian: "گوشت", pronunciation: "ات", category: "food", image: "🥩" },
+            { turkish: "Balık", persian: "ماهی", pronunciation: "بالیک", category: "food", image: "🐟" },
+            { turkish: "Tavuk", persian: "مرغ", pronunciation: "تاووک", category: "food", image: "🐔" },
+            { turkish: "Sebze", persian: "سبزیجات", pronunciation: "سبزه", category: "food", image: "🥬" },
+            { turkish: "Meyve", persian: "میوه", pronunciation: "میوه", category: "food", image: "🍎" },
+            { turkish: "Çay", persian: "چای", pronunciation: "چای", category: "food", image: "🍵" },
+            { turkish: "Kahve", persian: "قهوه", pronunciation: "قهوه", category: "food", image: "☕" },
+            { turkish: "Süt", persian: "شیر", pronunciation: "سوت", category: "food", image: "🥛" },
 
             // Colors
-            { turkish: "Kırmızı", persian: "قرمز", pronunciation: "کیرمیزی", category: "colors" },
-            { turkish: "Mavi", persian: "آبی", pronunciation: "ماوی", category: "colors" },
-            { turkish: "Yeşil", persian: "سبز", pronunciation: "یشیل", category: "colors" },
-            { turkish: "Sarı", persian: "زرد", pronunciation: "ساری", category: "colors" },
-            { turkish: "Beyaz", persian: "سفید", pronunciation: "بیاز", category: "colors" },
-            { turkish: "Siyah", persian: "سیاه", pronunciation: "سیاه", category: "colors" },
-            { turkish: "Pembe", persian: "صورتی", pronunciation: "پمبه", category: "colors" },
-            { turkish: "Mor", persian: "بنفش", pronunciation: "مور", category: "colors" },
+            { turkish: "Kırmızı", persian: "قرمز", pronunciation: "کیرمیزی", category: "colors", image: "🔴" },
+            { turkish: "Mavi", persian: "آبی", pronunciation: "ماوی", category: "colors", image: "🔵" },
+            { turkish: "Yeşil", persian: "سبز", pronunciation: "یشیل", category: "colors", image: "🟢" },
+            { turkish: "Sarı", persian: "زرد", pronunciation: "ساری", category: "colors", image: "🟡" },
+            { turkish: "Siyah", persian: "سیاه", pronunciation: "سیاه", category: "colors", image: "⚫" },
+            { turkish: "Beyaz", persian: "سفید", pronunciation: "بیاز", category: "colors", image: "⚪" },
+            { turkish: "Turuncu", persian: "نارنجی", pronunciation: "تورونجو", category: "colors", image: "🟠" },
+            { turkish: "Mor", persian: "بنفش", pronunciation: "مور", category: "colors", image: "🟣" },
+
+            // Numbers
+            { turkish: "Bir", persian: "یک", pronunciation: "بیر", category: "numbers", image: "1️⃣" },
+            { turkish: "İki", persian: "دو", pronunciation: "ایکی", category: "numbers", image: "2️⃣" },
+            { turkish: "Üç", persian: "سه", pronunciation: "اوچ", category: "numbers", image: "3️⃣" },
+            { turkish: "Dört", persian: "چهار", pronunciation: "دورت", category: "numbers", image: "4️⃣" },
+            { turkish: "Beş", persian: "پنج", pronunciation: "بش", category: "numbers", image: "5️⃣" },
+            { turkish: "Altı", persian: "شش", pronunciation: "آلتی", category: "numbers", image: "6️⃣" },
+            { turkish: "Yedi", persian: "هفت", pronunciation: "یدی", category: "numbers", image: "7️⃣" },
+            { turkish: "Sekiz", persian: "هشت", pronunciation: "سکیز", category: "numbers", image: "8️⃣" },
+            { turkish: "Dokuz", persian: "نه", pronunciation: "دوقوز", category: "numbers", image: "9️⃣" },
+            { turkish: "On", persian: "ده", pronunciation: "اون", category: "numbers", image: "🔟" },
 
             // Time
-            { turkish: "Bugün", persian: "امروز", pronunciation: "بوگون", category: "time" },
-            { turkish: "Dün", persian: "دیروز", pronunciation: "دون", category: "time" },
-            { turkish: "Yarın", persian: "فردا", pronunciation: "یارین", category: "time" },
-            { turkish: "Şimdi", persian: "الان", pronunciation: "شیمدی", category: "time" },
-            { turkish: "Saat", persian: "ساعت", pronunciation: "سات", category: "time" },
-            { turkish: "Dakika", persian: "دقیقه", pronunciation: "داکیکا", category: "time" },
-            { turkish: "Hafta", persian: "هفته", pronunciation: "هافتا", category: "time" },
-            { turkish: "Ay", persian: "ماه", pronunciation: "آی", category: "time" },
+            { turkish: "Saat", persian: "ساعت", pronunciation: "سات", category: "time", image: "🕐" },
+            { turkish: "Dakika", persian: "دقیقه", pronunciation: "داکیقا", category: "time", image: "⏱️" },
+            { turkish: "Gün", persian: "روز", pronunciation: "گون", category: "time", image: "📅" },
+            { turkish: "Hafta", persian: "هفته", pronunciation: "هافتا", category: "time", image: "📆" },
+            { turkish: "Ay", persian: "ماه", pronunciation: "آی", category: "time", image: "🗓️" },
+            { turkish: "Yıl", persian: "سال", pronunciation: "ییل", category: "time", image: "📊" },
+            { turkish: "Bugün", persian: "امروز", pronunciation: "بوگون", category: "time", image: "📍" },
+            { turkish: "Yarın", persian: "فردا", pronunciation: "یارین", category: "time", image: "➡️" },
+            { turkish: "Dün", persian: "دیروز", pronunciation: "دون", category: "time", image: "⬅️" },
 
             // Travel
-            { turkish: "Uçak", persian: "هواپیما", pronunciation: "اوچاک", category: "travel" },
-            { turkish: "Otobüs", persian: "اتوبوس", pronunciation: "اوتوبوس", category: "travel" },
-            { turkish: "Tren", persian: "قطار", pronunciation: "ترن", category: "travel" },
-            { turkish: "Taksi", persian: "تاکسی", pronunciation: "تاکسی", category: "travel" },
-            { turkish: "Otel", persian: "هتل", pronunciation: "اوتل", category: "travel" },
-            { turkish: "Havaalanı", persian: "فرودگاه", pronunciation: "هاوا آلانی", category: "travel" },
-            { turkish: "İstasyon", persian: "ایستگاه", pronunciation: "ایستاسیون", category: "travel" },
-            { turkish: "Bilet", persian: "بلیط", pronunciation: "بیلت", category: "travel" }
+            { turkish: "Uçak", persian: "هواپیما", pronunciation: "اوچاک", category: "travel", image: "✈️" },
+            { turkish: "Otobüs", persian: "اتوبوس", pronunciation: "اوتوبوس", category: "travel", image: "🚌" },
+            { turkish: "Tren", persian: "قطار", pronunciation: "ترن", category: "travel", image: "🚂" },
+            { turkish: "Taksi", persian: "تاکسی", pronunciation: "تاکسی", category: "travel", image: "🚕" },
+            { turkish: "Otel", persian: "هتل", pronunciation: "اوتل", category: "travel", image: "🏨" },
+            { turkish: "Havaalanı", persian: "فرودگاه", pronunciation: "هاوا آلانی", category: "travel", image: "🛫" },
+            { turkish: "İstasyon", persian: "ایستگاه", pronunciation: "ایستاسیون", category: "travel", image: "🚉" },
+            { turkish: "Bilet", persian: "بلیط", pronunciation: "بیلت", category: "travel", image: "🎫" }
         ];
 
-        let currentWords = [];
-        let displayedWords = [];
-        let wordsPerPage = 20;
-        let currentPage = 1;
+        let currentWords = [...dictionary];
         let currentCategory = 'all';
 
-        function initializeDictionary() {
-            currentWords = [...turkishWords];
-            displayWords();
-            updateWordCount();
-        }
+        function renderWords(words) {
+            const grid = document.getElementById('wordsGrid');
+            const wordCount = document.getElementById('wordCount');
+            
+            grid.innerHTML = '';
+            wordCount.textContent = `نمایش ${words.length} کلمه`;
 
-        function displayWords() {
-            const container = document.getElementById('wordsContainer');
-            const startIndex = (currentPage - 1) * wordsPerPage;
-            const endIndex = startIndex + wordsPerPage;
-            const wordsToShow = currentWords.slice(startIndex, endIndex);
-            
-            if (currentPage === 1) {
-                container.innerHTML = '';
-                displayedWords = [];
-            }
-            
-            wordsToShow.forEach(word => {
-                const wordCard = createWordCard(word);
-                container.appendChild(wordCard);
-                displayedWords.push(word);
-            });
-
-            // Update load more button
-            const loadMoreBtn = document.getElementById('loadMoreBtn');
-            if (endIndex >= currentWords.length) {
-                loadMoreBtn.style.display = 'none';
-            } else {
-                loadMoreBtn.style.display = 'block';
-            }
-        }
-
-        function createWordCard(word) {
-            const card = document.createElement('div');
-            card.className = 'word-card bg-white rounded-lg shadow-md p-6 border border-gray-200';
-            
-            const wordImage = getWordImage(word.turkish, word.category);
-            
-            card.innerHTML = `
-                <div class="text-center">
-                    <div class="mb-4 flex justify-center">
-                        ${wordImage}
+            words.forEach((word, index) => {
+                const wordCard = document.createElement('div');
+                wordCard.className = 'word-card bg-white rounded-xl p-6 shadow-md fade-in';
+                wordCard.style.animationDelay = `${index * 0.1}s`;
+                
+                wordCard.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-6xl mb-4">${word.image}</div>
+                        <div class="text-2xl font-bold text-blue-600 mb-2">${word.turkish}</div>
+                        <div class="text-lg text-gray-800 mb-2">${word.persian}</div>
+                        <div class="text-sm text-gray-500 mb-4">${word.pronunciation}</div>
+                        <button 
+                            class="pronunciation-btn text-white px-4 py-2 rounded-full text-sm font-medium"
+                            onclick="pronounceWord('${word.turkish}', this)"
+                        >
+                            🔊 تلفظ ترکی
+                        </button>
                     </div>
-                    <h3 class="text-2xl font-bold text-blue-600 mb-2">${word.turkish}</h3>
-                    <p class="text-lg text-gray-800 mb-2">${word.persian}</p>
-                    <p class="text-sm text-gray-500 mb-4">${word.pronunciation}</p>
-                    <button class="pronunciation-btn text-white px-4 py-2 rounded-full text-sm font-medium" onclick="speakWord('${word.turkish}')">
-                        🔊 تلفظ
-                    </button>
-                </div>
-            `;
-            
-            return card;
+                `;
+                
+                grid.appendChild(wordCard);
+            });
         }
 
         function searchWords() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             
             if (searchTerm === '') {
-                currentWords = currentCategory === 'all' ? [...turkishWords] : turkishWords.filter(word => word.category === currentCategory);
+                currentWords = currentCategory === 'all' ? [...dictionary] : dictionary.filter(word => word.category === currentCategory);
             } else {
-                const baseWords = currentCategory === 'all' ? turkishWords : turkishWords.filter(word => word.category === currentCategory);
+                const baseWords = currentCategory === 'all' ? dictionary : dictionary.filter(word => word.category === currentCategory);
                 currentWords = baseWords.filter(word => 
                     word.turkish.toLowerCase().includes(searchTerm) ||
                     word.persian.includes(searchTerm) ||
@@ -335,9 +366,7 @@
                 );
             }
             
-            currentPage = 1;
-            displayWords();
-            updateWordCount();
+            renderWords(currentWords);
         }
 
         function filterByCategory(category) {
@@ -354,135 +383,103 @@
             
             // Filter words
             if (category === 'all') {
-                currentWords = [...turkishWords];
+                currentWords = [...dictionary];
             } else {
-                currentWords = turkishWords.filter(word => word.category === category);
+                currentWords = dictionary.filter(word => word.category === category);
             }
             
             // Clear search
             document.getElementById('searchInput').value = '';
             
-            currentPage = 1;
-            displayWords();
-            updateWordCount();
+            renderWords(currentWords);
         }
 
-        function loadMoreWords() {
-            currentPage++;
-            displayWords();
-            updateWordCount();
-        }
-
-        function getWordImage(word, category) {
-            // Create beautiful SVG icons for each word category
-            const imageMap = {
-                // Greetings
-                'Merhaba': '<div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-2xl">👋</div>',
-                'Günaydın': '<div class="w-16 h-16 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center text-2xl">🌅</div>',
-                'İyi akşamlar': '<div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center text-2xl">🌆</div>',
-                'İyi geceler': '<div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-blue-600 rounded-full flex items-center justify-center text-2xl">🌙</div>',
-                'Hoşça kal': '<div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-2xl">👋</div>',
-                'Teşekkür ederim': '<div class="w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-2xl">🙏</div>',
-                'Rica ederim': '<div class="w-16 h-16 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center text-2xl">😊</div>',
-                'Özür dilerim': '<div class="w-16 h-16 bg-gradient-to-br from-red-300 to-pink-400 rounded-full flex items-center justify-center text-2xl">😔</div>',
-                
-                // Family
-                'Anne': '<div class="w-16 h-16 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full flex items-center justify-center text-2xl">👩</div>',
-                'Baba': '<div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-2xl">👨</div>',
-                'Kardeş': '<div class="w-16 h-16 bg-gradient-to-br from-green-400 to-teal-500 rounded-full flex items-center justify-center text-2xl">👫</div>',
-                'Oğul': '<div class="w-16 h-16 bg-gradient-to-br from-blue-300 to-blue-500 rounded-full flex items-center justify-center text-2xl">👦</div>',
-                'Kız': '<div class="w-16 h-16 bg-gradient-to-br from-pink-300 to-pink-500 rounded-full flex items-center justify-center text-2xl">👧</div>',
-                'Eş': '<div class="w-16 h-16 bg-gradient-to-br from-red-400 to-pink-500 rounded-full flex items-center justify-center text-2xl">💑</div>',
-                'Dede': '<div class="w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center text-2xl">👴</div>',
-                'Nine': '<div class="w-16 h-16 bg-gradient-to-br from-purple-300 to-purple-500 rounded-full flex items-center justify-center text-2xl">👵</div>',
-                
-                // Food
-                'Su': '<div class="w-16 h-16 bg-gradient-to-br from-blue-300 to-cyan-400 rounded-full flex items-center justify-center text-2xl">💧</div>',
-                'Ekmek': '<div class="w-16 h-16 bg-gradient-to-br from-yellow-600 to-orange-600 rounded-full flex items-center justify-center text-2xl">🍞</div>',
-                'Et': '<div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center text-2xl">🥩</div>',
-                'Balık': '<div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-teal-500 rounded-full flex items-center justify-center text-2xl">🐟</div>',
-                'Sebze': '<div class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-2xl">🥬</div>',
-                'Meyve': '<div class="w-16 h-16 bg-gradient-to-br from-red-400 to-yellow-500 rounded-full flex items-center justify-center text-2xl">🍎</div>',
-                'Çay': '<div class="w-16 h-16 bg-gradient-to-br from-green-600 to-yellow-600 rounded-full flex items-center justify-center text-2xl">🍵</div>',
-                'Kahve': '<div class="w-16 h-16 bg-gradient-to-br from-yellow-800 to-red-900 rounded-full flex items-center justify-center text-2xl">☕</div>',
-                
-                // Numbers
-                'Bir': '<div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">1</div>',
-                'İki': '<div class="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">2</div>',
-                'Üç': '<div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">3</div>',
-                'Dört': '<div class="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">4</div>',
-                'Beş': '<div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">5</div>',
-                'Altı': '<div class="w-16 h-16 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">6</div>',
-                'Yedi': '<div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">7</div>',
-                'Sekiz': '<div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">8</div>',
-                
-                // Colors
-                'Kırmızı': '<div class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-2xl">🔴</div>',
-                'Mavi': '<div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-2xl">🔵</div>',
-                'Yeşil': '<div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-2xl">🟢</div>',
-                'Sarı': '<div class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center text-2xl">🟡</div>',
-                'Beyaz': '<div class="w-16 h-16 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center text-2xl">⚪</div>',
-                'Siyah': '<div class="w-16 h-16 bg-black rounded-full flex items-center justify-center text-2xl">⚫</div>',
-                'Pembe': '<div class="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center text-2xl">🩷</div>',
-                'Mor': '<div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center text-2xl">🟣</div>',
-                
-                // Time
-                'Bugün': '<div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-2xl">📅</div>',
-                'Dün': '<div class="w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center text-2xl">⏮️</div>',
-                'Yarın': '<div class="w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-2xl">⏭️</div>',
-                'Şimdi': '<div class="w-16 h-16 bg-gradient-to-br from-red-400 to-pink-500 rounded-full flex items-center justify-center text-2xl">⏰</div>',
-                'Saat': '<div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-2xl">🕐</div>',
-                'Dakika': '<div class="w-16 h-16 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-2xl">⏱️</div>',
-                'Hafta': '<div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full flex items-center justify-center text-2xl">📆</div>',
-                'Ay': '<div class="w-16 h-16 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center text-2xl">🌙</div>',
-                
-                // Travel
-                'Uçak': '<div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full flex items-center justify-center text-2xl">✈️</div>',
-                'Otobüs': '<div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-full flex items-center justify-center text-2xl">🚌</div>',
-                'Tren': '<div class="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-600 rounded-full flex items-center justify-center text-2xl">🚂</div>',
-                'Taksi': '<div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-2xl">🚕</div>',
-                'Otel': '<div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-2xl">🏨</div>',
-                'Havaalanı': '<div class="w-16 h-16 bg-gradient-to-br from-gray-400 to-blue-500 rounded-full flex items-center justify-center text-2xl">🛫</div>',
-                'İstasyon': '<div class="w-16 h-16 bg-gradient-to-br from-red-400 to-orange-500 rounded-full flex items-center justify-center text-2xl">🚉</div>',
-                'Bilet': '<div class="w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-2xl">🎫</div>'
-            };
-            
-            return imageMap[word] || '<div class="w-16 h-16 bg-gradient-to-br from-gray-300 to-gray-500 rounded-full flex items-center justify-center text-2xl">📝</div>';
-        }
-
-        function updateWordCount() {
-            const wordCount = document.getElementById('wordCount');
-            const totalWords = currentWords.length;
-            const displayedCount = Math.min(displayedWords.length, totalWords);
-            
-            wordCount.textContent = `نمایش ${displayedCount} کلمه از ${totalWords} کلمه`;
-        }
-
-        function speakWord(word) {
-            // Create a simple pronunciation feedback
-            const button = event.target;
-            const originalText = button.innerHTML;
-            
-            button.innerHTML = '🔊 در حال پخش...';
-            button.disabled = true;
-            
-            // Simulate pronunciation (in a real app, you'd use text-to-speech)
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }, 1500);
-            
-            // You can integrate with Web Speech API or external TTS service here
+        function pronounceWord(word, button) {
+            // Check if speech synthesis is supported
             if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech
+                speechSynthesis.cancel();
+                
+                // Create speech utterance
                 const utterance = new SpeechSynthesisUtterance(word);
+                
+                // Set Turkish language and voice settings
                 utterance.lang = 'tr-TR';
                 utterance.rate = 0.8;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                
+                // Try to find a Turkish voice
+                const voices = speechSynthesis.getVoices();
+                const turkishVoice = voices.find(voice => 
+                    voice.lang.includes('tr') || 
+                    voice.name.toLowerCase().includes('turkish') ||
+                    voice.name.toLowerCase().includes('türk')
+                );
+                
+                if (turkishVoice) {
+                    utterance.voice = turkishVoice;
+                }
+                
+                // Update button state
+                const originalText = button.innerHTML;
+                button.classList.add('playing');
+                button.innerHTML = `
+                    <span class="audio-wave"></span>
+                    <span class="audio-wave"></span>
+                    <span class="audio-wave"></span>
+                    <span class="audio-wave"></span>
+                    در حال تلفظ...
+                `;
+                button.disabled = true;
+                
+                // Handle speech events
+                utterance.onend = function() {
+                    button.classList.remove('playing');
+                    button.innerHTML = '✅ تلفظ شد';
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    }, 1500);
+                };
+                
+                utterance.onerror = function() {
+                    button.classList.remove('playing');
+                    button.innerHTML = '❌ خطا در تلفظ';
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    }, 2000);
+                };
+                
+                // Speak the word
                 speechSynthesis.speak(utterance);
+                
+            } else {
+                // Fallback for browsers without speech synthesis
+                button.innerHTML = '❌ تلفظ پشتیبانی نمی‌شود';
+                setTimeout(() => {
+                    button.innerHTML = '🔊 تلفظ ترکی';
+                }, 2000);
             }
         }
 
-        // Initialize the dictionary when page loads
-        document.addEventListener('DOMContentLoaded', initializeDictionary);
+        // Load voices when available
+        function loadVoices() {
+            const voices = speechSynthesis.getVoices();
+            console.log('Available voices:', voices.filter(v => v.lang.includes('tr')));
+        }
+
+        // Initialize voices
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            renderWords(dictionary);
+            loadVoices();
+        });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96b55206d7fb71d0',t:'MTc1NDU1NDQ2Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96ce6b9a92826937',t:'MTc1NDgxNzY1OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
